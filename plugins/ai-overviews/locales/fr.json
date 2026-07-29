@@ -1,0 +1,20 @@
+{
+  "ai-overviews": {
+    "name": "Vue d’ensemble IA",
+    "description": "Génère au-dessus des résultats une réponse sourcée avec Ollama local ou plusieurs fournisseurs LLM cloud.",
+    "generated-by": "Généré avec",
+    "sources": "Sources",
+    "copy": "Copier",
+    "copied": "Copié",
+    "copy-failed": "Échec de la copie",
+    "show-more": "Afficher plus",
+    "retry": "Réessayer",
+    "send": "Envoyer",
+    "follow-up-placeholder": "Poser une question complémentaire",
+    "thinking": "Réflexion…",
+    "no-response": "Le modèle n’a renvoyé aucune réponse.",
+    "request-failed": "La requête a échoué.",
+    "stream-ended": "La réponse s’est interrompue.",
+    "disclaimer": "L’IA peut se tromper. Vérifiez les résultats cités."
+  }
+}

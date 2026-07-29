@@ -1,0 +1,351 @@
+.dgo-overview {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  color: var(--text-primary);
+}
+
+.dgo-overview [hidden] {
+  display: none !important;
+}
+
+.dgo-overview-header,
+.dgo-overview-heading,
+.dgo-overview-actions,
+.dgo-overview-follow-up,
+.dgo-overview-error {
+  display: flex;
+  align-items: center;
+}
+
+.dgo-overview-header {
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.dgo-overview-heading {
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.75rem;
+}
+
+.dgo-overview-heading h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.dgo-overview-provider,
+.dgo-overview-disclaimer,
+.dgo-overview-sources-label {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+}
+
+.dgo-overview-copy,
+.dgo-overview-expand,
+.dgo-overview-retry,
+.dgo-overview-send {
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--bg);
+  color: var(--text-primary);
+  font: inherit;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease-out,
+    border-color 160ms ease-out,
+    color 160ms ease-out;
+}
+
+.dgo-overview-copy,
+.dgo-overview-retry {
+  padding: 0.4rem 0.65rem;
+  font-size: 0.75rem;
+}
+
+.dgo-overview-copy:hover,
+.dgo-overview-expand:hover,
+.dgo-overview-retry:hover {
+  background: var(--bg-hover);
+}
+
+.dgo-overview-answer {
+  min-width: 0;
+  color: var(--text-primary);
+  font-size: 0.925rem;
+  line-height: 1.65;
+}
+
+.dgo-overview-answer > :first-child,
+.dgo-overview-message > :first-child {
+  margin-top: 0;
+}
+
+.dgo-overview-answer > :last-child,
+.dgo-overview-message > :last-child {
+  margin-bottom: 0;
+}
+
+.dgo-overview-answer--clamped {
+  max-height: 13rem;
+  overflow: hidden;
+  mask-image: linear-gradient(to bottom, #000 72%, transparent);
+}
+
+.dgo-overview-expand {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.dgo-overview-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.2rem 0;
+}
+
+.dgo-overview-skeleton span {
+  display: block;
+  width: 100%;
+  height: 0.75rem;
+  border-radius: 0.25rem;
+  background: var(--bg-hover);
+  animation: dgo-overview-pulse 1.4s ease-in-out infinite alternate;
+}
+
+.dgo-overview-skeleton span:nth-child(2) {
+  width: 92%;
+}
+
+.dgo-overview-skeleton span:nth-child(3),
+.dgo-overview-skeleton--reply span:nth-child(2) {
+  width: 68%;
+}
+
+@keyframes dgo-overview-pulse {
+  from {
+    opacity: 0.45;
+  }
+  to {
+    opacity: 0.95;
+  }
+}
+
+.dgo-overview-thinking {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+}
+
+.dgo-overview-thinking-text {
+  max-height: 3.5rem;
+  margin-top: 0.35rem;
+  overflow: auto;
+  white-space: pre-wrap;
+  opacity: 0.75;
+}
+
+.dgo-overview-citation {
+  display: inline-flex;
+  min-width: 1.55rem;
+  justify-content: center;
+  margin: 0 0.12rem;
+  vertical-align: 0.08em;
+  color: var(--text-link);
+  font-size: 0.68rem;
+  line-height: 1.4;
+  text-decoration: none;
+}
+
+.dgo-overview-citation:hover {
+  color: var(--primary-hover);
+}
+
+.dgo-overview-sources {
+  min-width: 0;
+}
+
+.dgo-overview-sources-label {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.dgo-overview-source-list {
+  display: flex;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0 0 0.25rem;
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: thin;
+}
+
+.dgo-overview-source-list li {
+  flex: 0 0 min(15rem, 72vw);
+}
+
+.dgo-overview-source {
+  display: flex;
+  min-height: 3.25rem;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--border-light);
+  border-radius: 0.65rem;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+a.dgo-overview-source:hover {
+  border-color: var(--border);
+  background: var(--bg-hover);
+}
+
+.dgo-overview-source-number {
+  display: inline-flex;
+  width: 1.45rem;
+  height: 1.45rem;
+  flex: 0 0 1.45rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  font-weight: 650;
+}
+
+.dgo-overview-source-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.dgo-overview-source-title,
+.dgo-overview-source-host {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dgo-overview-source-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.dgo-overview-source-host {
+  color: var(--text-secondary);
+  font-size: 0.68rem;
+}
+
+.dgo-overview-conversation {
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--border-light);
+}
+
+.dgo-overview-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.dgo-overview-message {
+  max-width: 75ch;
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.dgo-overview-message--user {
+  align-self: flex-end;
+  max-width: min(80%, 52ch);
+  padding: 0.55rem 0.75rem;
+  border-radius: 0.75rem;
+  background: var(--bg-hover);
+}
+
+.dgo-overview-follow-up {
+  gap: 0.5rem;
+}
+
+.dgo-overview-input {
+  min-height: 2.5rem;
+  max-height: 9rem;
+  flex: 1;
+  resize: none;
+}
+
+.dgo-overview-send {
+  align-self: flex-end;
+  padding: 0.62rem 0.85rem;
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--btn-text);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.dgo-overview-send:hover {
+  border-color: var(--primary-hover);
+  background: var(--primary-hover);
+}
+
+.dgo-overview-send:disabled,
+.dgo-overview-input:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.dgo-overview-error {
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 0.8rem;
+  border-radius: 0.65rem;
+  background: color-mix(in srgb, var(--danger) 10%, var(--bg));
+  color: var(--text-primary);
+  font-size: 0.82rem;
+}
+
+.dgo-overview-disclaimer {
+  margin: -0.2rem 0 0;
+  line-height: 1.45;
+}
+
+.dgo-overview :focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .dgo-overview-header {
+    align-items: flex-start;
+  }
+
+  .dgo-overview-heading {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dgo-overview-message--user {
+    max-width: 92%;
+  }
+
+  .dgo-overview-follow-up {
+    align-items: stretch;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dgo-overview *,
+  .dgo-overview *::before,
+  .dgo-overview *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

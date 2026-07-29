@@ -1,0 +1,20 @@
+{
+  "ai-overviews": {
+    "name": "AI Overview",
+    "description": "Streams a source-grounded answer above search results. Supports local Ollama and multiple cloud LLM providers.",
+    "generated-by": "Generated with",
+    "sources": "Sources",
+    "copy": "Copy",
+    "copied": "Copied",
+    "copy-failed": "Copy failed",
+    "show-more": "Show more",
+    "retry": "Retry",
+    "send": "Send",
+    "follow-up-placeholder": "Ask a follow-up",
+    "thinking": "Thinking…",
+    "no-response": "The model returned no answer.",
+    "request-failed": "Request failed.",
+    "stream-ended": "The response ended early.",
+    "disclaimer": "AI can make mistakes. Check the cited search results."
+  }
+}
