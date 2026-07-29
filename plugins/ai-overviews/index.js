@@ -119,7 +119,11 @@ export const slot = {
       return { html: "" };
     }
     if (configurationError(currentSettings)) return { html: "" };
-    const sources = buildSources(context?.results, currentSettings.maxSources);
+    const sources = buildSources(
+      context?.results,
+      currentSettings.maxSources,
+      context?.signProxyUrl,
+    );
     if (!sources.length) return { html: "" };
     return {
       html: buildPanelHtml({

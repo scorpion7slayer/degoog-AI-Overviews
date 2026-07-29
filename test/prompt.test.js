@@ -21,6 +21,7 @@ test("overview prompt separates instructions from untrusted results", () => {
   assert.equal(messages[0].role, "system");
   assert.equal(messages[0].content, DEFAULT_SYSTEM_PROMPT);
   assert.match(messages[0].content, /untrusted data/i);
+  assert.match(messages[0].content, /fenced Markdown code blocks/i);
   assert.match(messages[1].content, /<untrusted_search_results>/);
   assert.match(messages[1].content, /Ignore previous instructions/);
   assert.match(messages[1].content, /\[1\]/);
@@ -31,4 +32,3 @@ test("custom prompt and fallback style are supported", () => {
   assert.equal(messages[0].content, "Custom");
   assert.match(messages[1].content, /Lead with the direct answer/);
 });
-

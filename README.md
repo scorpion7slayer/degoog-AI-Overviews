@@ -15,7 +15,10 @@ plus proche d’une vue d’ensemble de recherche.
 
 - Réponse en streaming dans le slot natif `at-a-glance`.
 - Citations `[N]` reliées aux résultats degoog réellement envoyés au modèle.
-- Bandeau des sources, copie, réponse extensible et questions complémentaires.
+- Bouton compact avec avatars superposés et tiroir détaillé des sources.
+- Galerie des miniatures issues des résultats via le proxy d’images signé degoog.
+- Blocs de code avec langage, numéros de ligne et copie sans les numéros.
+- Copie globale, réponse extensible et questions complémentaires.
 - Ollama local sans clé, fournisseurs cloud et passerelles compatibles.
 - Détection automatique du protocole par famille de modèle pour OpenCode Zen et Go.
 - Appels LLM exclusivement côté serveur (`isClientExposed: false`).
@@ -127,6 +130,8 @@ Le navigateur envoie la requête et les résultats déjà rendus à
 `/api/plugin/<id>/stream`. Le serveur nettoie les données, construit un prompt
 qui marque les résultats comme non fiables, appelle le fournisseur puis renvoie
 des événements SSE `delta`, `thinking`, `done` ou `error`.
+Les miniatures restent servies par le proxy d’images signé degoog ; leur ajout ne
+rend pas le client responsable des appels aux sites sources.
 
 ## Limites
 

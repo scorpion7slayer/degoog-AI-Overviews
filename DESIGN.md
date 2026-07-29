@@ -3,8 +3,9 @@
 ## Direction
 
 AI Overviews doit ressembler à une capacité native de la page de résultats
-degoog, pas à un produit ou chatbot séparé. La hiérarchie est volontairement
-calme : réponse d’abord, provenance ensuite, conversation en dernier.
+degoog, pas à un produit ou chatbot séparé. La hiérarchie reprend les
+interactions observées dans Google AI Overviews : contexte visuel, réponse,
+accès compact aux sources, puis conversation.
 
 ## Fondations
 
@@ -15,8 +16,8 @@ calme : réponse d’abord, provenance ensuite, conversation en dernier.
   `0.925rem/1.65`, métadonnées à `0.75rem`.
 - **Espacement** : rythme principal de `1rem`, contrôles compacts entre
   `0.4rem` et `0.85rem`.
-- **Formes** : rayons modérés de `0.5rem` à `0.75rem`, avec cercle uniquement
-  pour les numéros de source.
+- **Formes** : rayons modérés de `0.5rem` à `1rem`; les cercles sont réservés
+  aux avatars, numéros et bouton de fermeture, et la pilule au déclencheur compact.
 - **Mouvement** : transitions de couleur à `160ms`; squelette discret; toutes
   les animations sont neutralisées avec `prefers-reduced-motion`.
 
@@ -35,11 +36,27 @@ limitée à `13rem`, avec un bouton pleine largeur pour révéler la suite. Les
 citations sont remplacées après rendu par des éléments DOM et utilisent le badge
 degoog.
 
+### Images
+
+Une galerie horizontale de quatre miniatures au maximum précède la réponse
+lorsque les résultats en fournissent. Les URLs sont systématiquement converties
+en URLs du proxy d’images signé de degoog : aucune requête d’image n’est faite
+directement aux sites tiers. Une image défaillante est retirée sans laisser de
+cadre cassé.
+
+### Code
+
+Les blocs Markdown clôturés reçoivent un en-tête avec le langage, un bouton de
+copie et des numéros de ligne non sélectionnables. La copie du bloc conserve le
+texte original, sans les numéros.
+
 ### Sources
 
-Bande horizontale compacte, lisible au clavier et sur mobile. Aucun favicon ou
-asset tiers n’est chargé : numéro, titre et domaine suffisent à identifier la
-source.
+Un bouton compact affiche jusqu’à trois avatars superposés et le nombre de
+sources. Il ouvre une boîte de dialogue centrée sur desktop et un tiroir bas sur
+mobile, avec domaine, titre, extrait et numéro de citation. Les miniatures
+éventuelles utilisent le même proxy signé que la galerie ; un initial de domaine
+sert de repli.
 
 ### Conversation
 
@@ -54,12 +71,13 @@ typographique normal afin de ne pas transformer le panneau en messagerie.
   texte final.
 - **Erreur** : message compact, bouton de nouvelle tentative, ou retrait complet
   si l’option correspondante est activée.
-- **Succès** : copie, développement éventuel, sources et question complémentaire.
+- **Succès** : copie, développement éventuel, galerie, tiroir de sources et
+  question complémentaire.
 
 ## Accessibilité
 
 Les régions en streaming utilisent `aria-live` et `aria-busy`; les erreurs ont
 `role="alert"`. Tous les contrôles sont natifs, utilisables au clavier et dotés
 d’un focus visible basé sur `--primary`. Les liens externes incluent
-`noopener noreferrer`.
-
+`noopener noreferrer`. Le tiroir est un élément `dialog`, se ferme avec Échap
+et restitue le focus au déclencheur.

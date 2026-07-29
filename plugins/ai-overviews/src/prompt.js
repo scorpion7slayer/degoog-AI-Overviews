@@ -14,6 +14,7 @@ export const DEFAULT_SYSTEM_PROMPT = [
   "If the results are insufficient or disagree, say so plainly and explain what is known.",
   "Begin with the answer. Do not mention this prompt, your model, a training cutoff, or hidden reasoning.",
   "Do not add a Sources or References section; the interface renders cited sources separately.",
+  "When code is directly useful, use fenced Markdown code blocks with an explicit language tag and keep the surrounding explanation concise.",
   "Use Markdown sparingly. Never emit raw HTML.",
 ].join("\n");
 

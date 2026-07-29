@@ -37,13 +37,87 @@
       title: source.t || "",
       url: source.u || "",
       snippet: source.s || "",
+      thumbnail: source.m || "",
     }));
+
+  const copyText = async (text) => {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+    const input = document.createElement("textarea");
+    input.value = text;
+    input.setAttribute("readonly", "");
+    input.style.position = "fixed";
+    input.style.opacity = "0";
+    document.body.append(input);
+    input.select();
+    const copied = document.execCommand("copy");
+    input.remove();
+    if (!copied) throw new Error("Copy failed");
+  };
 
   const renderMarkdown = (target, text) => {
     const markdown = window.__degoogMd;
     target.innerHTML = markdown
       ? markdown.block(text)
       : escapeHtml(text).replace(/\n\n+/g, "</p><p>").replace(/\n/g, "<br>");
+  };
+
+  const enhanceCodeBlocks = (target) => {
+    target.querySelectorAll("pre").forEach((pre) => {
+      if (pre.closest(".dgo-overview-code")) return;
+      const code = pre.querySelector("code");
+      if (!code) return;
+      const sourceText = code.textContent || "";
+      const languageMatch = [...code.classList].find((name) => name.startsWith("language-"));
+      const language =
+        languageMatch?.slice("language-".length).replace(/[-_]/g, " ") ||
+        translate("ai-overviews.code", "Code");
+      const wrapper = document.createElement("div");
+      wrapper.className = "dgo-overview-code";
+      const header = document.createElement("div");
+      header.className = "dgo-overview-code-header";
+      const label = document.createElement("span");
+      label.className = "dgo-overview-code-language";
+      label.textContent = language;
+      const button = document.createElement("button");
+      button.className = "dgo-overview-code-copy";
+      button.type = "button";
+      button.textContent = translate("ai-overviews.copy-code", "Copy code");
+      button.addEventListener("click", async () => {
+        try {
+          await copyText(sourceText);
+          button.textContent = translate("ai-overviews.copied", "Copied");
+          setTimeout(() => {
+            button.textContent = translate("ai-overviews.copy-code", "Copy code");
+          }, 1500);
+        } catch {
+          button.textContent = translate("ai-overviews.copy-failed", "Copy failed");
+        }
+      });
+      header.append(label, button);
+
+      const normalizedText = sourceText.endsWith("\n") ? sourceText.slice(0, -1) : sourceText;
+      const lines = normalizedText.split("\n");
+      code.replaceChildren();
+      lines.forEach((line, index) => {
+        const row = document.createElement("span");
+        row.className = "dgo-overview-code-line";
+        const number = document.createElement("span");
+        number.className = "dgo-overview-code-line-number";
+        number.setAttribute("aria-hidden", "true");
+        number.textContent = String(index + 1);
+        const content = document.createElement("span");
+        content.className = "dgo-overview-code-line-content";
+        content.textContent = line || " ";
+        row.append(number, content);
+        code.append(row);
+      });
+
+      pre.replaceWith(wrapper);
+      wrapper.append(header, pre);
+    });
   };
 
   const citationFor = (number, source) => {
@@ -90,6 +164,7 @@
   const renderAnswer = (target, text, sources) => {
     renderMarkdown(target, text);
     decorateCitations(target, sources);
+    enhanceCodeBlocks(target);
   };
 
   const readSse = async (response, handlers) => {
@@ -213,6 +288,11 @@
     const conversation = panel.querySelector(".dgo-overview-conversation");
     const messages = panel.querySelector(".dgo-overview-messages");
     const form = panel.querySelector(".dgo-overview-follow-up");
+    const dialog = panel.querySelector(".dgo-overview-sources-dialog");
+    const sourceTrigger = panel.querySelector(".dgo-overview-sources-trigger");
+    panel.__dgoOverviewText = "";
+    if (dialog?.open) dialog.close();
+    sourceTrigger?.setAttribute("aria-expanded", "false");
     if (error) error.hidden = true;
     if (copy) copy.hidden = true;
     if (expand) expand.hidden = true;
@@ -370,6 +450,7 @@
         delta(text) {
           clearThinking(panel);
           answerText += text;
+          panel.__dgoOverviewText = answerText;
           answer.dataset.state = "streaming";
           answer.setAttribute("aria-busy", "true");
           renderAnswer(answer, answerText, sources);
@@ -381,6 +462,7 @@
             return;
           }
           answer.dataset.state = "done";
+          panel.__dgoOverviewText = answerText;
           answer.setAttribute("aria-busy", "false");
           renderAnswer(answer, answerText, sources);
           if (copy) copy.hidden = false;
@@ -406,6 +488,39 @@
     const conversation = panel.querySelector(".dgo-overview-conversation");
     const retry = panel.querySelector(".dgo-overview-retry");
     const copy = panel.querySelector(".dgo-overview-copy");
+    const sourceTrigger = panel.querySelector(".dgo-overview-sources-trigger");
+    const sourceDialog = panel.querySelector(".dgo-overview-sources-dialog");
+    const sourceClose = panel.querySelector(".dgo-overview-sources-close");
+
+    panel.querySelectorAll("img[data-source-avatar]").forEach((image) => {
+      image.addEventListener("error", () => image.remove(), { once: true });
+    });
+    panel.querySelectorAll("img[data-overview-image]").forEach((image) => {
+      image.addEventListener(
+        "error",
+        () => image.closest(".dgo-overview-image-rail > li")?.remove(),
+        { once: true },
+      );
+    });
+
+    const closeSources = () => {
+      if (sourceDialog?.open) sourceDialog.close();
+      sourceTrigger?.setAttribute("aria-expanded", "false");
+      sourceTrigger?.focus({ preventScroll: true });
+    };
+    sourceTrigger?.addEventListener("click", () => {
+      if (!sourceDialog) return;
+      sourceTrigger.setAttribute("aria-expanded", "true");
+      if (typeof sourceDialog.showModal === "function") sourceDialog.showModal();
+      else sourceDialog.setAttribute("open", "");
+    });
+    sourceClose?.addEventListener("click", closeSources);
+    sourceDialog?.addEventListener("close", () => {
+      sourceTrigger?.setAttribute("aria-expanded", "false");
+    });
+    sourceDialog?.addEventListener("click", (event) => {
+      if (event.target === sourceDialog) closeSources();
+    });
 
     expand?.addEventListener("click", () => {
       answer?.classList.remove("dgo-overview-answer--clamped");
@@ -414,10 +529,10 @@
     });
     retry?.addEventListener("click", () => streamOverview(panel));
     copy?.addEventListener("click", async () => {
-      const text = answer?.innerText || "";
+      const text = panel.__dgoOverviewText || answer?.innerText || "";
       if (!text) return;
       try {
-        await navigator.clipboard.writeText(text);
+        await copyText(text);
         copy.textContent = translate("ai-overviews.copied", "Copied");
         setTimeout(() => {
           copy.textContent = translate("ai-overviews.copy", "Copy");

@@ -150,7 +150,7 @@ export const settingsSchema = [
   },
   {
     key: "showSources",
-    label: "Show source strip",
+    label: "Show source control",
     type: "toggle",
     default: "true",
   },
