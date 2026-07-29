@@ -491,6 +491,7 @@
     const sourceTrigger = panel.querySelector(".dgo-overview-sources-trigger");
     const sourceDialog = panel.querySelector(".dgo-overview-sources-dialog");
     const sourceClose = panel.querySelector(".dgo-overview-sources-close");
+    const modeLink = panel.querySelector("[data-ai-mode-link]");
 
     panel.querySelectorAll("img[data-source-avatar]").forEach((image) => {
       image.addEventListener("error", () => image.remove(), { once: true });
@@ -520,6 +521,18 @@
     });
     sourceDialog?.addEventListener("click", (event) => {
       if (event.target === sourceDialog) closeSources();
+    });
+    modeLink?.addEventListener("click", () => {
+      try {
+        sessionStorage.setItem(
+          "dgo-ai-mode-handoff",
+          JSON.stringify({
+            query: panel.dataset.query || "",
+            results: resultsFromSources(parseSources(panel)),
+            createdAt: Date.now(),
+          }),
+        );
+      } catch {}
     });
 
     expand?.addEventListener("click", () => {

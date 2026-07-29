@@ -3,6 +3,7 @@
     "name": "AI Overview",
     "description": "Streams a source-grounded answer above search results. Supports local Ollama and multiple cloud LLM providers.",
     "generated-by": "Generated with",
+    "ai-mode": "AI Mode",
     "source": "source",
     "sources": "sources",
     "all-sources": "Sources",

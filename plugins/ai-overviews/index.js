@@ -14,6 +14,13 @@ import {
   summaryCacheKey,
 } from "./src/panel.js";
 import {
+  basePathFromApiBase,
+  buildModeClientScript,
+  modeAssetResponse,
+  modePageResponse,
+  renderModePage,
+} from "./src/mode-page.js";
+import {
   FOLLOWUP_MIN_TOKENS,
   parseSettings,
   settingsSchema,
@@ -30,6 +37,10 @@ const MAX_CHAT_CHARS = 50_000;
 let currentSettings = parseSettings({});
 let summaryCache = null;
 let providerFetch = globalThis.fetch.bind(globalThis);
+let pluginApiBase = `/api/plugin/${PLUGIN_ID}`;
+let modePageTemplate = "";
+let modePageStyles = "";
+let modePageScript = "";
 
 const jsonResponse = (data, status = 200) =>
   new Response(JSON.stringify(data), {
@@ -100,6 +111,19 @@ export const slot = {
       summaryCache = context.createCache(DEFAULT_CACHE_TTL_MS);
     }
     if (typeof context?.fetch === "function") providerFetch = context.fetch;
+    if (typeof context?.apiBase === "string" && context.apiBase) {
+      pluginApiBase = context.apiBase;
+    }
+    if (typeof context?.readFile === "function") {
+      const [page, styles, script] = await Promise.all([
+        context.readFile("mode.html").catch(() => ""),
+        context.readFile("mode.css").catch(() => ""),
+        context.readFile("mode.js").catch(() => ""),
+      ]);
+      modePageTemplate = page;
+      modePageStyles = styles;
+      modePageScript = script;
+    }
   },
 
   configure(settings) {
@@ -133,6 +157,7 @@ export const slot = {
         providerLabel: providerLabel(currentSettings.provider),
         hideOnError: currentSettings.hideOnError,
         showSources: currentSettings.showSources,
+        modeUrl: `${pluginApiBase}/mode?q=${encodeURIComponent(normalizedQuery)}`,
       }),
     };
   },
@@ -141,6 +166,49 @@ export const slot = {
 };
 
 export const routes = [
+  {
+    method: "get",
+    path: "/mode",
+    handler(request) {
+      if (!modePageTemplate) {
+        return new Response("AI Mode page is unavailable.", { status: 503 });
+      }
+      return modePageResponse(
+        renderModePage(modePageTemplate, {
+          apiBase: pluginApiBase,
+          request,
+        }),
+      );
+    },
+  },
+  {
+    method: "get",
+    path: "/mode.css",
+    handler() {
+      if (!modePageStyles) {
+        return new Response("AI Mode styles are unavailable.", { status: 503 });
+      }
+      return modeAssetResponse(modePageStyles, "text/css; charset=utf-8");
+    },
+  },
+  {
+    method: "get",
+    path: "/mode.js",
+    handler() {
+      if (!modePageScript) {
+        return new Response("AI Mode client is unavailable.", { status: 503 });
+      }
+      return modeAssetResponse(
+        buildModeClientScript(modePageScript, {
+          apiBase: pluginApiBase,
+          searchUrl: `${basePathFromApiBase(pluginApiBase)}/api/search`,
+          maxSources: currentSettings.maxSources,
+          providerLabel: providerLabel(currentSettings.provider),
+        }),
+        "text/javascript; charset=utf-8",
+      );
+    },
+  },
   {
     method: "get",
     path: "/status",

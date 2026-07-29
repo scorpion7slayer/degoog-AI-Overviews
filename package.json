@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "test": "node --test",
-    "check": "node --check plugins/ai-overviews/index.js && node --check plugins/ai-overviews/script.js && node --test"
+    "check": "node --check plugins/ai-overviews/index.js && node --check plugins/ai-overviews/script.js && node --check plugins/ai-overviews/mode.js && node --check plugins/ai-overviews/src/mode-page.js && node --test"
   },
   "plugins": [
     {

@@ -202,6 +202,7 @@ export const buildPanelHtml = ({
   providerLabel,
   hideOnError,
   showSources,
+  modeUrl,
 }) => {
   const sourceData = sources.map((source) => ({
     i: source.index,
@@ -214,6 +215,7 @@ export const buildPanelHtml = ({
   const title = translated(t, "ai-overviews.name", "AI Overview");
   const generatedBy = translated(t, "ai-overviews.generated-by", "Generated with");
   const copy = translated(t, "ai-overviews.copy", "Copy");
+  const aiMode = translated(t, "ai-overviews.ai-mode", "AI Mode");
   const expand = translated(t, "ai-overviews.show-more", "Show more");
   const retry = translated(t, "ai-overviews.retry", "Retry");
   const followUp = translated(t, "ai-overviews.follow-up-placeholder", "Ask a follow-up");
@@ -236,6 +238,9 @@ export const buildPanelHtml = ({
     `<span class="dgo-overview-provider">${escapeHtml(generatedBy)} ${escapeHtml(providerLabel)}</span>` +
     "</div>" +
     '<div class="dgo-overview-actions">' +
+    (modeUrl
+      ? `<a class="dgo-overview-mode" href="${escapeHtml(modeUrl)}" data-ai-mode-link><span aria-hidden="true">✦</span>${escapeHtml(aiMode)}</a>`
+      : "") +
     `<button class="dgo-overview-copy degoog-icon-btn" type="button" hidden>${escapeHtml(copy)}</button>` +
     "</div>" +
     "</header>" +

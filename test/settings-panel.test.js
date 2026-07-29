@@ -103,6 +103,7 @@ test("panel HTML renders a compact source drawer and proxied image rail safely",
     providerLabel: "<OpenAI>",
     hideOnError: false,
     showSources: true,
+    modeUrl: "/api/plugin/test/mode?q=safe",
   });
   assert.doesNotMatch(html, /<img src=x/);
   assert.doesNotMatch(html, /href="javascript:/);
@@ -110,6 +111,8 @@ test("panel HTML renders a compact source drawer and proxied image rail safely",
   assert.match(html, /class="dgo-overview-sources-trigger"/);
   assert.match(html, /class="dgo-overview-sources-dialog"/);
   assert.match(html, /class="dgo-overview-image-rail"/);
+  assert.match(html, /class="dgo-overview-mode"/);
+  assert.match(html, /href="\/api\/plugin\/test\/mode\?q=safe"/);
   assert.match(html, /\/api\/proxy\/image\?url=/);
   assert.match(html, />2 sources</);
   assert.match(html, /&lt;OpenAI&gt;/);

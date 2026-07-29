@@ -64,6 +64,21 @@ Elle n’apparaît qu’une fois la réponse prête ou développée. Les message
 utilisateur sont distingués avec `--bg-hover`; les réponses restent dans le flux
 typographique normal afin de ne pas transformer le panneau en messagerie.
 
+### Mode IA
+
+La page complète est un espace de recherche et de lecture, pas une messagerie
+plein écran. La question devient le titre de la session ; la synthèse reste dans
+une colonne de `75ch` et les sources occupent un registre latéral fixe sur
+desktop, puis repassent sous la réponse sur mobile. Une barre compacte permet de
+relancer une recherche tandis que le composeur de suivi reste accessible au bas
+du viewport.
+
+L’état vide utilise une seule question centrale et des exemples courts. Aucun
+contenu commercial ou historique fictif n’est présenté. Les couleurs, la police,
+les surfaces, le focus et les miniatures proxifiées reprennent le système degoog.
+La page refuse l’empilement de bulles : chaque suivi devient une nouvelle section
+de lecture séparée par une ligne.
+
 ### États
 
 - **Chargement** : trois lignes de squelette.

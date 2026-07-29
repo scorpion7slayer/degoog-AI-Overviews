@@ -3,6 +3,7 @@
     "name": "Vue d’ensemble IA",
     "description": "Génère au-dessus des résultats une réponse sourcée avec Ollama local ou plusieurs fournisseurs LLM cloud.",
     "generated-by": "Généré avec",
+    "ai-mode": "Mode IA",
     "source": "source",
     "sources": "sources",
     "all-sources": "Sources",

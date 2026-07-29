@@ -1,9 +1,12 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import { routes, slot } from "../plugins/ai-overviews/index.js";
 
 const route = (path) => routes.find((candidate) => candidate.path === path);
+const readPluginFile = (name) =>
+  readFile(new URL(`../plugins/ai-overviews/${name}`, import.meta.url), "utf8");
 
 test("slot follows the degoog at-a-glance contract", () => {
   assert.equal(slot.position, "at-a-glance");
@@ -24,6 +27,8 @@ test("configured local Ollama renders a panel and streams through the server", a
   };
   let providerRequest;
   await slot.init({
+    apiBase: "/api/plugin/store-installed-ai-overviews",
+    readFile: readPluginFile,
     useCache: () => fakeCache,
     fetch: async (url, init) => {
       providerRequest = { url, init };
@@ -52,6 +57,10 @@ test("configured local Ollama renders a panel and streams through the server", a
   const executed = await slot.execute("what is degoog?", { results });
   assert.match(executed.html, /class="dgo-overview/);
   assert.match(executed.html, /data-stream="1"/);
+  assert.match(
+    executed.html,
+    /href="\/api\/plugin\/store-installed-ai-overviews\/mode\?q=what%20is%20degoog%3F"/,
+  );
 
   const response = await route("/stream").handler(
     new Request("http://degoog.test/api/plugin/ai-overviews/stream", {
@@ -75,6 +84,29 @@ test("configured local Ollama renders a panel and streams through the server", a
     }),
   );
   assert.match(await cachedResponse.text(), /"finishReason":"cache"/);
+
+  const modePage = await route("/mode").handler(
+    new Request("http://degoog.test/api/plugin/store-installed-ai-overviews/mode", {
+      headers: { "Accept-Language": "fr-FR,fr;q=0.9" },
+    }),
+  );
+  assert.equal(modePage.status, 200);
+  assert.match(modePage.headers.get("content-type"), /text\/html/);
+  assert.match(modePage.headers.get("content-security-policy"), /default-src 'self'/);
+  const modeHtml = await modePage.text();
+  assert.match(modeHtml, /<title>Mode IA · degoog<\/title>/);
+  assert.match(modeHtml, /\/api\/plugin\/store-installed-ai-overviews\/mode\.css/);
+
+  const modeScript = await route("/mode.js").handler();
+  assert.equal(modeScript.status, 200);
+  assert.match(modeScript.headers.get("content-type"), /text\/javascript/);
+  const modeScriptText = await modeScript.text();
+  assert.match(modeScriptText, /"apiBase":"\/api\/plugin\/store-installed-ai-overviews"/);
+  assert.match(modeScriptText, /"maxSources":8/);
+
+  const modeStyles = await route("/mode.css").handler();
+  assert.equal(modeStyles.status, 200);
+  assert.match(modeStyles.headers.get("content-type"), /text\/css/);
 });
 
 test("routes reject malformed or oversized requests", async () => {
@@ -98,4 +130,3 @@ test("routes reject malformed or oversized requests", async () => {
   );
   assert.equal(oversized.status, 413);
 });
-

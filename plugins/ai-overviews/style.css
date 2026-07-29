@@ -43,6 +43,7 @@
 }
 
 .dgo-overview-copy,
+.dgo-overview-mode,
 .dgo-overview-expand,
 .dgo-overview-retry,
 .dgo-overview-send {
@@ -59,15 +60,28 @@
 }
 
 .dgo-overview-copy,
+.dgo-overview-mode,
 .dgo-overview-retry {
   padding: 0.4rem 0.65rem;
   font-size: 0.75rem;
 }
 
 .dgo-overview-copy:hover,
+.dgo-overview-mode:hover,
 .dgo-overview-expand:hover,
 .dgo-overview-retry:hover {
   background: var(--bg-hover);
+}
+
+.dgo-overview-mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  text-decoration: none;
+}
+
+.dgo-overview-mode span {
+  color: var(--primary);
 }
 
 .dgo-overview-answer {

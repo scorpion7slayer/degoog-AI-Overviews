@@ -14,6 +14,8 @@ plus proche d’une vue d’ensemble de recherche.
 ## Fonctionnalités
 
 - Réponse en streaming dans le slot natif `at-a-glance`.
+- Véritable page **Mode IA**, ouverte depuis l’Overview, avec recherche degoog,
+  réponse en page complète, sources latérales et questions complémentaires.
 - Citations `[N]` reliées aux résultats degoog réellement envoyés au modèle.
 - Bouton compact avec avatars superposés et tiroir détaillé des sources.
 - Galerie des miniatures issues des résultats via le proxy d’images signé degoog.
@@ -121,6 +123,9 @@ plugins/ai-overviews/
 ├── index.js               # contrat slot, réglages et routes serveur
 ├── script.js              # streaming, citations et suivi côté navigateur
 ├── style.css              # rendu natif degoog
+├── mode.html              # page complète Mode IA
+├── mode.css               # espace de recherche desktop/mobile
+├── mode.js                # recherche degoog, streaming et conversation
 ├── locales/               # traductions en/fr
 ├── providers/             # adaptateurs protocolaires
 └── src/                   # prompt, panneau, pipeline SSE et validation
@@ -133,12 +138,23 @@ des événements SSE `delta`, `thinking`, `done` ou `error`.
 Les miniatures restent servies par le proxy d’images signé degoog ; leur ajout ne
 rend pas le client responsable des appels aux sites sources.
 
+Depuis un Overview, le bouton **Mode IA** transmet temporairement la requête et
+les sources déjà chargées à la page complète. Une nouvelle question lancée dans
+cette page interroge l’API de recherche degoog, puis envoie uniquement ses
+résultats nettoyés au même pipeline LLM côté serveur. L’URL réelle de la page est
+construite avec `ctx.apiBase`, afin de rester valide après une installation Store.
+La page peut aussi être ouverte directement sur `<ctx.apiBase>/mode` ; une
+requête placée dans `?q=` est relancée avec les moteurs degoog actifs.
+
 ## Limites
 
 - Une citation signifie que le modèle l’a associée à un extrait de résultat ;
   elle ne remplace pas la vérification de la page source.
 - Le plugin synthétise les résultats degoog. Il ne reproduit pas le classement,
   les modèles, les données propriétaires ni les réponses de Google.
+- Le Mode IA fourni ici prend en charge le texte et les questions de suivi. Il
+  n’implémente pas encore l’envoi vocal, les fichiers, les images utilisateur ou
+  un historique persistant.
 - La qualité dépend du moteur de recherche, des extraits disponibles, du modèle
   choisi et de sa discipline de citation.
 - Les tarifs, modèles, limites et politiques de confidentialité restent ceux de
