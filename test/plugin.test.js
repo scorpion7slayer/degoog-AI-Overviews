@@ -13,10 +13,22 @@ const route = (path) => routes.find((candidate) => candidate.path === path);
 const readPluginFile = (name) =>
   readFile(new URL(`../plugins/ai-overviews/${name}`, import.meta.url), "utf8");
 
+test("Store manifest ships the repository image and matching release versions", async () => {
+  const packageUrl = new URL("../package.json", import.meta.url);
+  const manifest = JSON.parse(await readFile(packageUrl, "utf8"));
+  assert.equal(manifest.version, "1.0.1");
+  assert.equal(manifest.plugins[0].version, manifest.version);
+  assert.equal(manifest["repo-image"], "assets/repo-image.png");
+
+  const image = await readFile(new URL(`../${manifest["repo-image"]}`, import.meta.url));
+  assert.deepEqual([...image.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
+});
+
 test("slot follows the degoog at-a-glance contract", () => {
   assert.equal(slot.position, "at-a-glance");
   assert.equal(slot.waitForResults, true);
   assert.equal(slot.isClientExposed, false);
+  assert.equal(slot.needsAppRestart, true);
   assert.equal(slot.trigger("query"), false);
 });
 
@@ -33,13 +45,56 @@ test("plugin registers an English AI Mode search-bar action", async () => {
   const clientScript = await readPluginFile("script.js");
   let searchBarHandler;
   let assignedUrl = "";
+  const input = { value: "privacy search engines" };
+  const createElement = (tagName) => {
+    const element = {
+      tagName,
+      children: [],
+      dataset: {},
+      listeners: {},
+      append(...children) {
+        this.children.push(...children);
+      },
+      addEventListener(type, listener) {
+        this.listeners[type] = listener;
+      },
+      setAttribute(name, value) {
+        this[name] = value;
+      },
+    };
+    return element;
+  };
+  const searchBarContainer = {
+    id: "search-bar-actions-home",
+    children: [],
+    querySelector(selector) {
+      const actionId = selector.match(/data-action-id="([^"]+)"/)?.[1];
+      return this.children.find((child) => child.dataset.actionId === actionId) || null;
+    },
+    append(...children) {
+      this.children.push(...children);
+    },
+  };
   vm.runInNewContext(
     clientScript.replaceAll(
       "__PLUGIN_ID__",
       JSON.stringify("store-installed-ai-overviews"),
     ),
     {
-      document: { getElementById: () => null },
+      document: {
+        readyState: "complete",
+        createElement,
+        getElementById(id) {
+          if (id === "search-input") return input;
+          return null;
+        },
+        querySelectorAll(selector) {
+          return selector === ".search-bar-actions" ? [searchBarContainer] : [];
+        },
+      },
+      MutationObserver: class {
+        observe() {}
+      },
       URL,
       window: {
         addEventListener(type, handler) {
@@ -56,6 +111,9 @@ test("plugin registers an English AI Mode search-bar action", async () => {
   );
 
   assert.equal(typeof searchBarHandler, "function");
+  assert.equal(searchBarContainer.children.length, 1);
+  assert.equal(searchBarContainer.children[0].className, "search-bar-action-btn");
+  assert.equal(searchBarContainer.children[0].children[0].textContent, "AI Mode");
   searchBarHandler({
     detail: {
       actionId: "another-plugin-ai-mode",
@@ -67,7 +125,7 @@ test("plugin registers an English AI Mode search-bar action", async () => {
   searchBarHandler({
     detail: {
       actionId: "store-installed-ai-overviews-ai-mode",
-      input: { value: "privacy search engines" },
+      input,
     },
   });
   assert.equal(

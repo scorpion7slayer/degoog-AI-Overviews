@@ -106,6 +106,7 @@ export const slot = {
   position: "at-a-glance",
   waitForResults: true,
   isClientExposed: false,
+  needsAppRestart: true,
   get description() {
     return (
       this.t?.("ai-overviews.description") ||

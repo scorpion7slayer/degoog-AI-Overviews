@@ -2,13 +2,60 @@
   const apiBase = `/api/plugin/${__PLUGIN_ID__}`;
   const searchBarActionId = `${__PLUGIN_ID__}-ai-mode`;
 
-  window.addEventListener("search-bar-action", (event) => {
-    if (event?.detail?.actionId !== searchBarActionId) return;
-    const query = String(event.detail.input?.value || "").trim();
+  const openAiMode = (input) => {
+    const query = String(input?.value || "").trim();
     const url = new URL(`${apiBase}/mode`, window.location.origin);
     if (query) url.searchParams.set("q", query);
     window.location.assign(`${url.pathname}${url.search}`);
+  };
+
+  window.addEventListener("search-bar-action", (event) => {
+    if (event?.detail?.actionId !== searchBarActionId) return;
+    openAiMode(event.detail.input);
   });
+
+  const ensureSearchBarAction = (container) => {
+    if (container.querySelector(`[data-action-id="${searchBarActionId}"]`)) return;
+    const inputId =
+      container.id === "search-bar-actions-results"
+        ? "results-search-input"
+        : "search-input";
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "search-bar-action-btn";
+    button.dataset.actionId = searchBarActionId;
+    button.dataset.actionType = "custom";
+    button.dataset.inputId = inputId;
+    button.setAttribute("aria-label", "AI Mode");
+    const label = document.createElement("span");
+    label.className = "search-bar-action-label";
+    label.textContent = "AI Mode";
+    button.append(label);
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      openAiMode(document.getElementById(inputId));
+    });
+    container.append(button);
+  };
+
+  const installSearchBarActions = () => {
+    document.querySelectorAll(".search-bar-actions").forEach((container) => {
+      ensureSearchBarAction(container);
+      new MutationObserver(() => ensureSearchBarAction(container)).observe(
+        container,
+        { childList: true },
+      );
+    });
+  };
+
+  if (document.readyState === "loading") {
+    window.addEventListener("DOMContentLoaded", installSearchBarActions, {
+      once: true,
+    });
+  } else {
+    installSearchBarActions();
+  }
 
   const glanceRoot = document.getElementById("at-a-glance");
   if (!glanceRoot) return;
