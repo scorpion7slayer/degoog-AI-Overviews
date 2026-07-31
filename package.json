@@ -1,6 +1,6 @@
 {
   "name": "degoog-ai-overviews",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A source-grounded, multi-provider AI Overview slot for degoog search.",
   "author": "scorpion7slayer",
   "license": "MIT",
@@ -14,7 +14,7 @@
       "path": "plugins/ai-overviews",
       "name": "AI Overviews",
       "description": "Streams a cited answer above degoog results with local and cloud LLM providers.",
-      "version": "0.1.0",
+      "version": "1.0.0",
       "type": "slot",
       "minDegoogVersion": "0.23.0"
     }
