@@ -17,7 +17,7 @@
         <span class="dgo-ai-mode-brand-word" aria-hidden="true">
           <span>d</span><span>e</span><span>g</span><span>o</span><span>o</span><span>g</span>
         </span>
-        <span class="dgo-ai-mode-badge"><span aria-hidden="true">✦</span> {{title}}</span>
+        <span class="dgo-ai-mode-badge">{{title}}</span>
       </a>
 
       <form class="dgo-ai-mode-query-form dgo-ai-mode-query-form--compact" data-mode-query-form hidden>
@@ -35,7 +35,6 @@
     <main class="dgo-ai-mode-main">
       <section class="dgo-ai-mode-empty" data-mode-empty>
         <div class="dgo-ai-mode-empty-copy">
-          <p class="dgo-ai-mode-kicker"><span aria-hidden="true">✦</span> {{title}}</p>
           <h1>{{emptyTitle}}</h1>
           <p>{{emptyDescription}}</p>
         </div>
@@ -49,16 +48,19 @@
           </button>
         </form>
 
-        <div class="dgo-ai-mode-suggestions" aria-label="{{examples}}">
-          <button type="button" data-mode-suggestion="{{exampleOne}}">{{exampleOne}}</button>
-          <button type="button" data-mode-suggestion="{{exampleTwo}}">{{exampleTwo}}</button>
-          <button type="button" data-mode-suggestion="{{exampleThree}}">{{exampleThree}}</button>
+        <div class="dgo-ai-mode-suggestions">
+          <p>{{examples}}</p>
+          <div aria-label="{{examples}}">
+            <button type="button" data-mode-suggestion="{{exampleOne}}">{{exampleOne}}</button>
+            <button type="button" data-mode-suggestion="{{exampleTwo}}">{{exampleTwo}}</button>
+            <button type="button" data-mode-suggestion="{{exampleThree}}">{{exampleThree}}</button>
+          </div>
         </div>
       </section>
 
       <section class="dgo-ai-mode-session" data-mode-session hidden>
         <header class="dgo-ai-mode-session-heading">
-          <p><span aria-hidden="true">✦</span> {{answerLabel}}</p>
+          <p>{{answerLabel}}</p>
           <h1 data-mode-question></h1>
           <span data-mode-provider></span>
         </header>
@@ -68,7 +70,7 @@
             <ul class="dgo-ai-mode-image-rail" data-mode-images hidden></ul>
 
             <div class="dgo-ai-mode-thinking" data-mode-thinking hidden>
-              <span class="dgo-ai-mode-thinking-mark" aria-hidden="true">✦</span>
+              <span class="dgo-ai-mode-thinking-mark" aria-hidden="true"></span>
               <span>{{thinking}}</span>
               <span data-mode-thinking-text></span>
             </div>

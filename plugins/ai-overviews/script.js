@@ -1,8 +1,28 @@
 (function () {
   const apiBase = `/api/plugin/${__PLUGIN_ID__}`;
   const searchBarActionId = `${__PLUGIN_ID__}-ai-mode`;
+  const searchAuthStorageKey = "dgo-ai-mode-search-auth";
+
+  const rememberSearchAuth = () => {
+    const auth = window.__DEGOOG_SEARCH_AUTH__;
+    if (
+      typeof auth?.n !== "string" ||
+      typeof auth?.s !== "string" ||
+      !/^[a-f0-9]{32,128}$/i.test(auth.n) ||
+      !/^[a-f0-9]{32,256}$/i.test(auth.s)
+    ) {
+      return;
+    }
+    try {
+      sessionStorage.setItem(
+        searchAuthStorageKey,
+        JSON.stringify({ ...auth, createdAt: Date.now() }),
+      );
+    } catch {}
+  };
 
   const openAiMode = (input) => {
+    rememberSearchAuth();
     const query = String(input?.value || "").trim();
     const url = new URL(`${apiBase}/mode`, window.location.origin);
     if (query) url.searchParams.set("q", query);

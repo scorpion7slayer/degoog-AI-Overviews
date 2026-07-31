@@ -10,9 +10,9 @@ const COPY = {
   classicSearch: "Classic search",
   emptyTitle: "What do you want to explore?",
   emptyDescription:
-    "Ask a broad question. AI Mode searches with degoog, synthesizes the results, and keeps the web sources within reach.",
+    "Search the web and get a source-grounded answer you can verify.",
   explore: "Explore",
-  examples: "Example questions",
+  examples: "Try asking",
   exampleOne: "Compare local and cloud LLMs for a small team",
   exampleTwo: "Explain photosynthesis step by step",
   exampleThree: "How do I read a JSON file in Python?",

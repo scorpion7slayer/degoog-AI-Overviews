@@ -6,6 +6,8 @@
     generatedWith: "Generated with",
     thinking: "Thinking…",
     searchFailed: "Degoog could not retrieve search results.",
+    searchAuthorizationFailed:
+      "Degoog blocked the search request. Refresh the page and try again.",
     noSources: "No usable web source was found for this question.",
     requestFailed: "The AI response could not be generated.",
     streamEnded: "The response ended before completion.",
@@ -38,6 +40,7 @@
   const followupInput = document.querySelector("[data-mode-followup-input]");
   const queryForms = [...document.querySelectorAll("[data-mode-query-form]")];
   const queryInputs = [...document.querySelectorAll("[data-mode-query-input]")];
+  const searchAuthStorageKey = "dgo-ai-mode-search-auth";
 
   const state = {
     query: "",
@@ -46,6 +49,70 @@
     history: [],
     overviewController: null,
     chatController: null,
+    searchAuth: null,
+  };
+
+  const isSearchAuth = (value) =>
+    typeof value?.n === "string" &&
+    typeof value?.s === "string" &&
+    /^[a-f0-9]{32,128}$/i.test(value.n) &&
+    /^[a-f0-9]{32,256}$/i.test(value.s);
+
+  const rememberSearchAuth = (auth) => {
+    if (!isSearchAuth(auth)) return null;
+    state.searchAuth = { n: auth.n, s: auth.s };
+    try {
+      sessionStorage.setItem(
+        searchAuthStorageKey,
+        JSON.stringify({ ...state.searchAuth, createdAt: Date.now() }),
+      );
+    } catch {}
+    return state.searchAuth;
+  };
+
+  const readStoredSearchAuth = () => {
+    try {
+      const stored = JSON.parse(sessionStorage.getItem(searchAuthStorageKey) || "null");
+      if (
+        isSearchAuth(stored) &&
+        Date.now() - Number(stored.createdAt || 0) < 55 * 60_000
+      ) {
+        return rememberSearchAuth(stored);
+      }
+    } catch {}
+    return null;
+  };
+
+  const authFromPageHtml = (html) => {
+    const match = String(html || "").match(
+      /window\.__DEGOOG_SEARCH_AUTH__\s*=\s*(\{[^<]+\})/,
+    );
+    if (!match) return null;
+    try {
+      return rememberSearchAuth(JSON.parse(match[1]));
+    } catch {
+      return null;
+    }
+  };
+
+  const resolveSearchAuth = async (signal, forceRefresh = false) => {
+    if (!forceRefresh && state.searchAuth) return state.searchAuth;
+    if (!forceRefresh) {
+      const fromWindow = rememberSearchAuth(globalThis.__DEGOOG_SEARCH_AUTH__);
+      if (fromWindow) return fromWindow;
+      const stored = readStoredSearchAuth();
+      if (stored) return stored;
+    }
+
+    const homeUrl = `${String(config.basePath || "").replace(/\/$/, "")}/`;
+    const response = await fetch(homeUrl, {
+      headers: { Accept: "text/html" },
+      cache: "no-store",
+      credentials: "same-origin",
+      signal,
+    });
+    if (!response.ok) return null;
+    return authFromPageHtml(await response.text());
   };
 
   try {
@@ -476,16 +543,38 @@
   };
 
   const searchDegoog = async (query, signal) => {
-    const response = await fetch(config.searchUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query, type: "web" }),
-      signal,
-    });
+    const request = async (auth) =>
+      fetch(config.searchUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(auth
+            ? {
+                "x-search-nonce": auth.n,
+                "x-search-sig": auth.s,
+              }
+            : {}),
+        },
+        body: JSON.stringify({ query, type: "web" }),
+        credentials: "same-origin",
+        signal,
+      });
+
+    let response = await request(await resolveSearchAuth(signal));
+    if (response.status === 401) {
+      state.searchAuth = null;
+      try {
+        sessionStorage.removeItem(searchAuthStorageKey);
+      } catch {}
+      response = await request(await resolveSearchAuth(signal, true));
+    }
     let payload = {};
     try {
       payload = await response.json();
     } catch {}
+    if (response.status === 401) {
+      throw new Error(copy.searchAuthorizationFailed);
+    }
     if (!response.ok) throw new Error(payload?.error || copy.searchFailed);
     return payload?.results || [];
   };

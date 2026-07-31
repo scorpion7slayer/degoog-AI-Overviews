@@ -211,6 +211,7 @@ export const routes = [
       return modeAssetResponse(
         buildModeClientScript(modePageScript, {
           apiBase: pluginApiBase,
+          basePath: basePathFromApiBase(pluginApiBase),
           searchUrl: `${basePathFromApiBase(pluginApiBase)}/api/search`,
           maxSources: currentSettings.maxSources,
           providerLabel: providerLabel(currentSettings.provider),

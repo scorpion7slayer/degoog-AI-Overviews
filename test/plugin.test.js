@@ -16,7 +16,7 @@ const readPluginFile = (name) =>
 test("Store manifest ships the repository image and matching release versions", async () => {
   const packageUrl = new URL("../package.json", import.meta.url);
   const manifest = JSON.parse(await readFile(packageUrl, "utf8"));
-  assert.equal(manifest.version, "1.0.1");
+  assert.equal(manifest.version, "1.0.2");
   assert.equal(manifest.plugins[0].version, manifest.version);
   assert.equal(manifest["repo-image"], "assets/repo-image.png");
 
@@ -45,6 +45,7 @@ test("plugin registers an English AI Mode search-bar action", async () => {
   const clientScript = await readPluginFile("script.js");
   let searchBarHandler;
   let assignedUrl = "";
+  const sessionValues = new Map();
   const input = { value: "privacy search engines" };
   const createElement = (tagName) => {
     const element = {
@@ -97,6 +98,10 @@ test("plugin registers an English AI Mode search-bar action", async () => {
       },
       URL,
       window: {
+        __DEGOOG_SEARCH_AUTH__: {
+          n: "a".repeat(44),
+          s: "b".repeat(64),
+        },
         addEventListener(type, handler) {
           if (type === "search-bar-action") searchBarHandler = handler;
         },
@@ -105,6 +110,11 @@ test("plugin registers an English AI Mode search-bar action", async () => {
           assign(url) {
             assignedUrl = url;
           },
+        },
+      },
+      sessionStorage: {
+        setItem(key, value) {
+          sessionValues.set(key, value);
         },
       },
     },
@@ -132,6 +142,12 @@ test("plugin registers an English AI Mode search-bar action", async () => {
     assignedUrl,
     "/api/plugin/store-installed-ai-overviews/mode?q=privacy+search+engines",
   );
+  const storedSearchAuth = JSON.parse(
+    sessionValues.get("dgo-ai-mode-search-auth"),
+  );
+  assert.equal(storedSearchAuth.n, "a".repeat(44));
+  assert.equal(storedSearchAuth.s, "b".repeat(64));
+  assert.equal(typeof storedSearchAuth.createdAt, "number");
 });
 
 test("configured local Ollama renders a panel and streams through the server", async () => {
@@ -221,6 +237,7 @@ test("configured local Ollama renders a panel and streams through the server", a
   assert.match(modeScript.headers.get("content-type"), /text\/javascript/);
   const modeScriptText = await modeScript.text();
   assert.match(modeScriptText, /"apiBase":"\/api\/plugin\/store-installed-ai-overviews"/);
+  assert.match(modeScriptText, /"basePath":""/);
   assert.match(modeScriptText, /"maxSources":8/);
 
   const modeStyles = await route("/mode.css").handler();
