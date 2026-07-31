@@ -1,8 +1,13 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import vm from "node:vm";
 
-import { routes, slot } from "../plugins/ai-overviews/index.js";
+import {
+  routes,
+  searchBarActions,
+  slot,
+} from "../plugins/ai-overviews/index.js";
 
 const route = (path) => routes.find((candidate) => candidate.path === path);
 const readPluginFile = (name) =>
@@ -13,6 +18,62 @@ test("slot follows the degoog at-a-glance contract", () => {
   assert.equal(slot.waitForResults, true);
   assert.equal(slot.isClientExposed, false);
   assert.equal(slot.trigger("query"), false);
+});
+
+test("plugin registers an English AI Mode search-bar action", async () => {
+  assert.deepEqual(searchBarActions, [
+    {
+      id: "ai-mode",
+      label: "AI Mode",
+      type: "custom",
+      isClientExposed: false,
+    },
+  ]);
+
+  const clientScript = await readPluginFile("script.js");
+  let searchBarHandler;
+  let assignedUrl = "";
+  vm.runInNewContext(
+    clientScript.replaceAll(
+      "__PLUGIN_ID__",
+      JSON.stringify("store-installed-ai-overviews"),
+    ),
+    {
+      document: { getElementById: () => null },
+      URL,
+      window: {
+        addEventListener(type, handler) {
+          if (type === "search-bar-action") searchBarHandler = handler;
+        },
+        location: {
+          origin: "https://degoog.test",
+          assign(url) {
+            assignedUrl = url;
+          },
+        },
+      },
+    },
+  );
+
+  assert.equal(typeof searchBarHandler, "function");
+  searchBarHandler({
+    detail: {
+      actionId: "another-plugin-ai-mode",
+      input: { value: "ignored query" },
+    },
+  });
+  assert.equal(assignedUrl, "");
+
+  searchBarHandler({
+    detail: {
+      actionId: "store-installed-ai-overviews-ai-mode",
+      input: { value: "privacy search engines" },
+    },
+  });
+  assert.equal(
+    assignedUrl,
+    "/api/plugin/store-installed-ai-overviews/mode?q=privacy+search+engines",
+  );
 });
 
 test("configured local Ollama renders a panel and streams through the server", async () => {
@@ -94,7 +155,7 @@ test("configured local Ollama renders a panel and streams through the server", a
   assert.match(modePage.headers.get("content-type"), /text\/html/);
   assert.match(modePage.headers.get("content-security-policy"), /default-src 'self'/);
   const modeHtml = await modePage.text();
-  assert.match(modeHtml, /<title>Mode IA · degoog<\/title>/);
+  assert.match(modeHtml, /<title>AI Mode · degoog<\/title>/);
   assert.match(modeHtml, /\/api\/plugin\/store-installed-ai-overviews\/mode\.css/);
 
   const modeScript = await route("/mode.js").handler();

@@ -1,8 +1,18 @@
 (function () {
+  const apiBase = `/api/plugin/${__PLUGIN_ID__}`;
+  const searchBarActionId = `${__PLUGIN_ID__}-ai-mode`;
+
+  window.addEventListener("search-bar-action", (event) => {
+    if (event?.detail?.actionId !== searchBarActionId) return;
+    const query = String(event.detail.input?.value || "").trim();
+    const url = new URL(`${apiBase}/mode`, window.location.origin);
+    if (query) url.searchParams.set("q", query);
+    window.location.assign(`${url.pathname}${url.search}`);
+  });
+
   const glanceRoot = document.getElementById("at-a-glance");
   if (!glanceRoot) return;
 
-  const apiBase = `/api/plugin/${__PLUGIN_ID__}`;
   const streamUrl = `${apiBase}/stream`;
   const chatUrl = `${apiBase}/chat`;
 

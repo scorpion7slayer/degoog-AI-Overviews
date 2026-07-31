@@ -2,97 +2,98 @@
 
 ## Direction
 
-AI Overviews doit ressembler à une capacité native de la page de résultats
-degoog, pas à un produit ou chatbot séparé. La hiérarchie reprend les
-interactions observées dans Google AI Overviews : contexte visuel, réponse,
-accès compact aux sources, puis conversation.
+AI Overviews should feel like a native capability of the degoog results page,
+not a separate product or chatbot. Its hierarchy follows the interactions seen
+in Google AI Overviews: visual context, answer, compact access to sources, and
+then conversation.
 
-## Fondations
+## Foundations
 
-- **Couleurs** : exclusivement les variables de thème degoog (`--bg`,
-  `--bg-hover`, `--text-primary`, `--text-secondary`, `--text-link`,
-  `--border`, `--border-light`, `--primary`, `--danger`).
-- **Typographie** : police héritée de degoog ; titre à `1rem`, corps à
-  `0.925rem/1.65`, métadonnées à `0.75rem`.
-- **Espacement** : rythme principal de `1rem`, contrôles compacts entre
-  `0.4rem` et `0.85rem`.
-- **Formes** : rayons modérés de `0.5rem` à `1rem`; les cercles sont réservés
-  aux avatars, numéros et bouton de fermeture, et la pilule au déclencheur compact.
-- **Mouvement** : transitions de couleur à `160ms`; squelette discret; toutes
-  les animations sont neutralisées avec `prefers-reduced-motion`.
+- **Color:** use only degoog theme variables (`--bg`, `--bg-hover`,
+  `--text-primary`, `--text-secondary`, `--text-link`, `--border`,
+  `--border-light`, `--primary`, and `--danger`).
+- **Typography:** inherit degoog's typeface; use `1rem` for headings,
+  `0.925rem/1.65` for body text, and `0.75rem` for metadata.
+- **Spacing:** use a primary `1rem` rhythm, with compact controls between
+  `0.4rem` and `0.85rem`.
+- **Shape:** use moderate radii from `0.5rem` to `1rem`; reserve circles for
+  avatars, numbers, and the close button, and the pill shape for the compact
+  trigger.
+- **Motion:** use `160ms` color transitions and a restrained skeleton; disable
+  every animation with `prefers-reduced-motion`.
 
-## Composants
+## Components
 
-### Panneau
+### Panel
 
-Réutilise `degoog-panel`, `degoog-panel--slot` et
-`degoog-panel--slot-body-padded`. Le plugin ne crée ni fond spectaculaire, ni
-ombre ou bordure concurrente avec le thème.
+Reuse `degoog-panel`, `degoog-panel--slot`, and
+`degoog-panel--slot-body-padded`. The plugin should not introduce a dramatic
+background, shadow, or border that competes with the theme.
 
-### Réponse
+### Answer
 
-Le contenu Markdown passe par le renderer nettoyé de degoog. Une vue longue est
-limitée à `13rem`, avec un bouton pleine largeur pour révéler la suite. Les
-citations sont remplacées après rendu par des éléments DOM et utilisent le badge
-degoog.
+Markdown content passes through degoog's sanitized renderer. A long preview is
+limited to `13rem`, with a full-width button that reveals the remainder.
+Citations are replaced with DOM elements after rendering and use the degoog
+badge.
 
 ### Images
 
-Une galerie horizontale de quatre miniatures au maximum précède la réponse
-lorsque les résultats en fournissent. Les URLs sont systématiquement converties
-en URLs du proxy d’images signé de degoog : aucune requête d’image n’est faite
-directement aux sites tiers. Une image défaillante est retirée sans laisser de
-cadre cassé.
+A horizontal gallery of up to four thumbnails precedes the answer when results
+provide them. URLs are always converted into signed degoog image-proxy URLs, so
+the browser never requests images directly from third-party websites. A failed
+image is removed without leaving a broken frame.
 
 ### Code
 
-Les blocs Markdown clôturés reçoivent un en-tête avec le langage, un bouton de
-copie et des numéros de ligne non sélectionnables. La copie du bloc conserve le
-texte original, sans les numéros.
+Fenced Markdown blocks receive a header with the language, a copy button, and
+non-selectable line numbers. Copying preserves the original code without the
+line numbers.
 
 ### Sources
 
-Un bouton compact affiche jusqu’à trois avatars superposés et le nombre de
-sources. Il ouvre une boîte de dialogue centrée sur desktop et un tiroir bas sur
-mobile, avec domaine, titre, extrait et numéro de citation. Les miniatures
-éventuelles utilisent le même proxy signé que la galerie ; un initial de domaine
-sert de repli.
+A compact button shows up to three stacked avatars and the source count. It
+opens a centered dialog on desktop and a bottom drawer on mobile, with the
+domain, title, snippet, and citation number. Optional thumbnails use the same
+signed proxy as the gallery; a domain initial provides the fallback.
 
 ### Conversation
 
-Elle n’apparaît qu’une fois la réponse prête ou développée. Les messages
-utilisateur sont distingués avec `--bg-hover`; les réponses restent dans le flux
-typographique normal afin de ne pas transformer le panneau en messagerie.
+The conversation appears only when the answer is ready or expanded. User
+messages use `--bg-hover`; answers remain in the normal typographic flow so that
+the panel does not turn into a chat interface.
 
-### Mode IA
+### AI Mode
 
-La page complète est un espace de recherche et de lecture, pas une messagerie
-plein écran. La question devient le titre de la session ; la synthèse reste dans
-une colonne de `75ch` et les sources occupent un registre latéral fixe sur
-desktop, puis repassent sous la réponse sur mobile. Une barre compacte permet de
-relancer une recherche tandis que le composeur de suivi reste accessible au bas
-du viewport.
+The full-page view is a search and reading workspace, not full-screen messaging.
+The question becomes the session title; the synthesis remains in a `75ch`
+column, while sources occupy a fixed side register on desktop and move below the
+answer on mobile. A compact bar starts a new search while the follow-up composer
+remains accessible at the bottom of the viewport.
 
-L’état vide utilise une seule question centrale et des exemples courts. Aucun
-contenu commercial ou historique fictif n’est présenté. Les couleurs, la police,
-les surfaces, le focus et les miniatures proxifiées reprennent le système degoog.
-La page refuse l’empilement de bulles : chaque suivi devient une nouvelle section
-de lecture séparée par une ligne.
+An **AI Mode** action is also present inside the degoog home and results search
+bars. It uses degoog's native search-bar action styling, opens AI Mode directly,
+and carries over the current query when the field is not empty.
 
-### États
+The empty state uses one central question and short examples. It contains no
+commercial content or invented history. Color, typography, surfaces, focus
+treatment, and proxied thumbnails reuse the degoog system. The page avoids
+stacked chat bubbles: each follow-up becomes a new reading section separated by
+a line.
 
-- **Chargement** : trois lignes de squelette.
-- **Raisonnement** : zone textuelle secondaire et bornée, masquée dès le premier
-  texte final.
-- **Erreur** : message compact, bouton de nouvelle tentative, ou retrait complet
-  si l’option correspondante est activée.
-- **Succès** : copie, développement éventuel, galerie, tiroir de sources et
-  question complémentaire.
+### States
 
-## Accessibilité
+- **Loading:** three skeleton lines.
+- **Reasoning:** a bounded secondary text region, hidden when the first final
+  text arrives.
+- **Error:** a compact message and retry button, or complete removal when the
+  corresponding option is enabled.
+- **Success:** copy, optional expansion, gallery, source drawer, and follow-up
+  question.
 
-Les régions en streaming utilisent `aria-live` et `aria-busy`; les erreurs ont
-`role="alert"`. Tous les contrôles sont natifs, utilisables au clavier et dotés
-d’un focus visible basé sur `--primary`. Les liens externes incluent
-`noopener noreferrer`. Le tiroir est un élément `dialog`, se ferme avec Échap
-et restitue le focus au déclencheur.
+## Accessibility
+
+Streaming regions use `aria-live` and `aria-busy`; errors use `role="alert"`.
+Every control is native, keyboard-accessible, and has a visible focus treatment
+based on `--primary`. External links include `noopener noreferrer`. The drawer
+is a `dialog` element, closes with Escape, and restores focus to its trigger.

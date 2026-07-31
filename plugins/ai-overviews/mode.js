@@ -2,41 +2,22 @@
   const config = globalThis.__DGO_AI_MODE_CONFIG__;
   if (!config) return;
 
-  const locale = document.documentElement.lang.toLowerCase().startsWith("fr") ? "fr" : "en";
   const copy = {
-    en: {
-      generatedWith: "Generated with",
-      thinking: "Thinking…",
-      searchFailed: "Degoog could not retrieve search results.",
-      noSources: "No usable web source was found for this question.",
-      requestFailed: "The AI response could not be generated.",
-      streamEnded: "The response ended before completion.",
-      retry: "Try again",
-      you: "You",
-      answer: "AI Mode",
-      copyCode: "Copy code",
-      copied: "Copied",
-      copyFailed: "Copy failed",
-      code: "Code",
-      openImage: "Open image source",
-    },
-    fr: {
-      generatedWith: "Généré avec",
-      thinking: "Réflexion…",
-      searchFailed: "degoog n’a pas pu récupérer les résultats de recherche.",
-      noSources: "Aucune source Web exploitable n’a été trouvée pour cette question.",
-      requestFailed: "La réponse IA n’a pas pu être générée.",
-      streamEnded: "La réponse s’est interrompue avant la fin.",
-      retry: "Réessayer",
-      you: "Vous",
-      answer: "Mode IA",
-      copyCode: "Copier le code",
-      copied: "Copié",
-      copyFailed: "Échec de la copie",
-      code: "Code",
-      openImage: "Ouvrir la source de l’image",
-    },
-  }[locale];
+    generatedWith: "Generated with",
+    thinking: "Thinking…",
+    searchFailed: "Degoog could not retrieve search results.",
+    noSources: "No usable web source was found for this question.",
+    requestFailed: "The AI response could not be generated.",
+    streamEnded: "The response ended before completion.",
+    retry: "Try again",
+    you: "You",
+    answer: "AI Mode",
+    copyCode: "Copy code",
+    copied: "Copied",
+    copyFailed: "Copy failed",
+    code: "Code",
+    openImage: "Open image source",
+  };
 
   const emptyView = document.querySelector("[data-mode-empty]");
   const sessionView = document.querySelector("[data-mode-session]");

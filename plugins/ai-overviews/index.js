@@ -34,6 +34,15 @@ const MAX_REQUEST_BYTES = 160_000;
 const MAX_CHAT_MESSAGES = 14;
 const MAX_CHAT_CHARS = 50_000;
 
+export const searchBarActions = [
+  {
+    id: "ai-mode",
+    label: "AI Mode",
+    type: "custom",
+    isClientExposed: false,
+  },
+];
+
 let currentSettings = parseSettings({});
 let summaryCache = null;
 let providerFetch = globalThis.fetch.bind(globalThis);

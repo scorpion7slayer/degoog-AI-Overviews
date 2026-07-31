@@ -7,7 +7,7 @@ import {
   renderModePage,
 } from "../plugins/ai-overviews/src/mode-page.js";
 
-test("AI Mode page uses the installed plugin API base and request language", () => {
+test("AI Mode page uses the installed plugin API base and always renders in English", () => {
   const html = renderModePage(
     "<html lang=\"{{lang}}\"><title>{{title}}</title><link href=\"{{apiBase}}/mode.css\"><a href=\"{{basePath}}/\">{{backHome}}</a></html>",
     {
@@ -18,8 +18,8 @@ test("AI Mode page uses the installed plugin API base and request language", () 
       ),
     },
   );
-  assert.match(html, /lang="fr"/);
-  assert.match(html, /<title>Mode IA<\/title>/);
+  assert.match(html, /lang="en"/);
+  assert.match(html, /<title>AI Mode<\/title>/);
   assert.match(html, /\/degoog\/api\/plugin\/author-repo-ai-overviews\/mode\.css/);
   assert.match(html, /href="\/degoog\/"/);
   assert.equal(

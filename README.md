@@ -1,185 +1,188 @@
-# AI Overviews pour degoog
+# AI Overviews for degoog
 
-Un plugin slot pour [degoog](https://github.com/degoog-org/degoog) qui génère une
-réponse synthétique et sourcée au-dessus des résultats de recherche. Il reprend
-les interactions utiles des Google AI Overviews — réponse directe, citations,
-sources visibles et question complémentaire — sans appeler ni extraire les AI
-Overviews de Google.
+A slot plugin for [degoog](https://github.com/degoog-org/degoog) that generates a
+concise, source-grounded answer above search results. It brings together the
+useful interactions found in Google AI Overviews—direct answers, citations,
+visible sources, and follow-up questions—without calling or scraping Google's AI
+Overviews.
 
-Le plugin se base sur l’architecture du plugin officiel
-[AI Summary](https://github.com/degoog-org/official-extensions/tree/main/plugins/ai-summary),
-avec davantage de fournisseurs, un adaptateur OpenAI Responses et une interface
-plus proche d’une vue d’ensemble de recherche.
+The plugin builds on the architecture of the official
+[AI Summary](https://github.com/degoog-org/official-extensions/tree/main/plugins/ai-summary)
+plugin, with more providers, an OpenAI Responses adapter, and an interface
+designed to feel more like a search overview.
 
-## Fonctionnalités
+## Features
 
-- Réponse en streaming dans le slot natif `at-a-glance`.
-- Véritable page **Mode IA**, ouverte depuis l’Overview, avec recherche degoog,
-  réponse en page complète, sources latérales et questions complémentaires.
-- Citations `[N]` reliées aux résultats degoog réellement envoyés au modèle.
-- Bouton compact avec avatars superposés et tiroir détaillé des sources.
-- Galerie des miniatures issues des résultats via le proxy d’images signé degoog.
-- Blocs de code avec langage, numéros de ligne et copie sans les numéros.
-- Copie globale, réponse extensible et questions complémentaires.
-- Ollama local sans clé, fournisseurs cloud et passerelles compatibles.
-- Détection automatique du protocole par famille de modèle pour OpenCode Zen et Go.
-- Appels LLM exclusivement côté serveur (`isClientExposed: false`).
-- Clés enregistrées comme secrets degoog et jamais exposées au navigateur.
-- Protection contre les instructions injectées dans les titres ou extraits de résultats.
-- Cache configurable, limites de requête, délai d’expiration et mode question uniquement.
-- Interface anglaise et française, responsive et compatible avec le mode mouvement réduit.
+- Streams answers in the native `at-a-glance` slot.
+- Adds an **AI Mode** action to the degoog home and results search bars.
+- Provides a dedicated **AI Mode** page, opened from the Overview, with degoog
+  search, full-page answers, a source sidebar, and follow-up questions.
+- Links `[N]` citations to the exact degoog results sent to the model.
+- Includes a compact source button with stacked avatars and a detailed source drawer.
+- Displays result thumbnails through degoog's signed image proxy.
+- Enhances code blocks with language labels, line numbers, and number-free copying.
+- Supports full-answer copying, expandable answers, and follow-up questions.
+- Runs local Ollama models without an API key and supports cloud providers and compatible gateways.
+- Automatically selects the protocol by model family for OpenCode Zen and Go.
+- Makes all LLM calls server-side (`isClientExposed: false`).
+- Stores API keys as degoog secrets and never exposes them to the browser.
+- Protects against instructions injected into search-result titles or snippets.
+- Offers configurable caching, request limits, timeouts, and question-only mode.
+- Provides a responsive English interface with reduced-motion support.
 
 ## Installation
 
-### Depuis le Store degoog
+### From the degoog Store
 
-1. Ouvrir **Settings → Store**.
-2. Ajouter le dépôt `https://github.com/scorpion7slayer/degoog-AI-Overviews`.
-3. Installer **AI Overviews**.
-4. Redémarrer degoog si l’instance ne recharge pas automatiquement les extensions.
-5. Ouvrir la configuration du plugin, choisir un fournisseur, un modèle et, si nécessaire, une clé API.
+1. Open **Settings → Store**.
+2. Add the repository `https://github.com/scorpion7slayer/degoog-AI-Overviews`.
+3. Install **AI Overviews**.
+4. Restart degoog if the instance does not reload extensions automatically.
+5. Open the plugin settings and select a provider, a model, and an API key when required.
 
-Le `package.json` à la racine respecte le format des
-[dépôts Store degoog](https://degoog-org.github.io/docs/store.html).
+The root `package.json` follows the
+[degoog Store repository format](https://degoog-org.github.io/docs/store.html).
 
-### Installation manuelle
+### Manual installation
 
-Copier le dossier `plugins/ai-overviews` dans :
+Copy the `plugins/ai-overviews` directory to:
 
 ```text
 data/plugins/ai-overviews
 ```
 
-ou dans le répertoire défini par `DEGOOG_PLUGINS_DIR`, puis redémarrer degoog.
+or to the directory configured through `DEGOOG_PLUGINS_DIR`, then restart degoog.
 
-## Fournisseurs
+## Providers
 
-| Preset | Protocole utilisé | URL par défaut | Clé |
+| Preset | Protocol | Default URL | API key |
 |---|---|---|---|
-| Ollama local | Ollama `/api/chat` | `http://localhost:11434` | Non |
-| Ollama Cloud | Ollama `/api/chat` | `https://ollama.com` | Oui |
-| OpenCode Zen | Auto selon le modèle | `https://opencode.ai/zen/v1` | Oui |
-| OpenCode Go | Auto selon le modèle | `https://opencode.ai/zen/go/v1` | Oui |
-| OpenAI | Responses API | `https://api.openai.com/v1` | Oui |
-| OpenAI compatible | Chat Completions | À renseigner | Selon la passerelle |
-| Google Gemini | GenerateContent natif | `https://generativelanguage.googleapis.com/v1beta` | Oui |
-| Kilo Code Gateway | Chat Completions | `https://api.kilo.ai/api/gateway` | Oui |
-| Moonshot / Kimi | Chat Completions | `https://api.moonshot.ai/v1` | Oui |
-| Anthropic | Messages API | `https://api.anthropic.com/v1` | Oui |
-| OpenRouter | Chat Completions | `https://openrouter.ai/api/v1` | Oui |
-| Qwen / Alibaba | Chat Completions | `https://dashscope-intl.aliyuncs.com/compatible-mode/v1` | Oui |
-| Z.AI / GLM | Chat Completions | `https://api.z.ai/api/paas/v4` | Oui |
-| Perplexity Sonar | Chat Completions | `https://api.perplexity.ai` | Oui |
-| Cloudflare Workers AI | Chat Completions | Construit depuis l’Account ID | Oui |
-| xAI | Chat Completions | `https://api.x.ai/v1` | Oui |
-| Cursor via gateway | Chat Completions | À renseigner | Oui |
+| Local Ollama | Ollama `/api/chat` | `http://localhost:11434` | No |
+| Ollama Cloud | Ollama `/api/chat` | `https://ollama.com` | Yes |
+| OpenCode Zen | Automatic by model | `https://opencode.ai/zen/v1` | Yes |
+| OpenCode Go | Automatic by model | `https://opencode.ai/zen/go/v1` | Yes |
+| OpenAI | Responses API | `https://api.openai.com/v1` | Yes |
+| OpenAI-compatible | Chat Completions | User-defined | Gateway-dependent |
+| Google Gemini | Native GenerateContent | `https://generativelanguage.googleapis.com/v1beta` | Yes |
+| Kilo Code Gateway | Chat Completions | `https://api.kilo.ai/api/gateway` | Yes |
+| Moonshot / Kimi | Chat Completions | `https://api.moonshot.ai/v1` | Yes |
+| Anthropic | Messages API | `https://api.anthropic.com/v1` | Yes |
+| OpenRouter | Chat Completions | `https://openrouter.ai/api/v1` | Yes |
+| Qwen / Alibaba | Chat Completions | `https://dashscope-intl.aliyuncs.com/compatible-mode/v1` | Yes |
+| Z.AI / GLM | Chat Completions | `https://api.z.ai/api/paas/v4` | Yes |
+| Perplexity Sonar | Chat Completions | `https://api.perplexity.ai` | Yes |
+| Cloudflare Workers AI | Chat Completions | Built from the Account ID | Yes |
+| xAI | Chat Completions | `https://api.x.ai/v1` | Yes |
+| Cursor through a gateway | Chat Completions | User-defined | Yes |
 
-Les identifiants de modèle changent plus vite que le plugin. Utiliser l’identifiant
-exact affiché par le fournisseur. Pour OpenCode, saisir l’identifiant de l’API
-directe (`gpt-5.6-terra`, `qwen3.7-plus`, `kimi-k3`, etc.), sans le préfixe de la
-configuration TUI `opencode/` ou `opencode-go/`.
+Model identifiers change more quickly than the plugin. Use the exact identifier
+shown by the provider. For OpenCode, enter the direct API model identifier
+(`gpt-5.6-terra`, `qwen3.7-plus`, `kimi-k3`, and so on), without the `opencode/`
+or `opencode-go/` prefix used in the TUI configuration.
 
-### Cas particuliers
+### Provider notes
 
-**Ollama et Docker.** `localhost` désigne le conteneur degoog. Sur Docker Desktop,
-utiliser généralement `http://host.docker.internal:11434` comme surcharge d’URL.
-Sur Linux, rendre l’hôte Ollama accessible au conteneur ou placer les services
-sur le même réseau.
+**Ollama and Docker.** `localhost` refers to the degoog container. On Docker
+Desktop, use `http://host.docker.internal:11434` as the URL override in most
+cases. On Linux, expose the Ollama host to the container or place both services
+on the same network.
 
-**OpenCode Zen.** Le plugin choisit automatiquement Responses pour les modèles
-GPT, Messages pour Claude et Qwen, GenerateContent pour Gemini, et Chat
-Completions pour les autres familles. Le réglage avancé de protocole permet de
-corriger un futur changement côté fournisseur.
+**OpenCode Zen.** The plugin automatically selects Responses for GPT models,
+Messages for Claude and Qwen, GenerateContent for Gemini, and Chat Completions
+for other model families. The advanced protocol setting can override this
+selection if the provider changes its behavior.
 
-**OpenCode Go.** Qwen et MiniMax utilisent Messages ; les autres familles
-actuellement documentées utilisent Chat Completions.
+**OpenCode Go.** Qwen and MiniMax use Messages; the other currently documented
+model families use Chat Completions.
 
-**Cloudflare Workers AI.** Renseigner l’Account ID et la clé API. L’AI Gateway ID
-est facultatif ; il est transmis dans l’en-tête `cf-aig-gateway-id`. Une URL de
-base complète peut aussi remplacer le preset.
+**Cloudflare Workers AI.** Enter the Account ID and API key. The AI Gateway ID
+is optional and is sent in the `cf-aig-gateway-id` header. A complete base URL
+can also override the preset.
 
-**Cursor.** Cursor ne publie pas d’API générale de chat/inférence compatible
-OpenAI. Le preset ne prétend donc pas utiliser directement un abonnement Cursor :
-il exige l’URL de votre propre passerelle compatible et sa clé.
+**Cursor.** Cursor does not publish a general OpenAI-compatible chat or inference
+API. This preset therefore does not claim to use a Cursor subscription directly:
+it requires the URL and key for your own compatible gateway.
 
 ## Configuration
 
-Les réglages principaux sont :
+The main settings are:
 
-- **LLM provider**, **Model ID**, **API key** ;
-- **Answer depth** : concise, équilibrée ou détaillée ;
-- nombre de sources degoog, de 3 à 12 ;
-- affichage des sources et déclenchement réservé aux requêtes terminées par `?`.
+- **LLM provider**, **Model ID**, and **API key**;
+- **Answer depth**: concise, balanced, or detailed;
+- the number of degoog sources, from 3 to 12;
+- source visibility and question-mark-only triggering.
 
-Les réglages avancés permettent de surcharger l’URL et le protocole, activer le
-raisonnement, modifier le délai, les tokens, le cache et le prompt système.
-L’activation du raisonnement peut augmenter le coût et la latence ; son contenu
-n’est jamais fusionné dans la réponse finale.
+Advanced settings let you override the URL and protocol, enable reasoning,
+change the timeout, token limit, cache, and system prompt. Enabling reasoning can
+increase cost and latency; reasoning content is never merged into the final
+answer.
 
 ## Architecture
 
 ```text
 plugins/ai-overviews/
-├── index.js               # contrat slot, réglages et routes serveur
-├── script.js              # streaming, citations et suivi côté navigateur
-├── style.css              # rendu natif degoog
-├── mode.html              # page complète Mode IA
-├── mode.css               # espace de recherche desktop/mobile
-├── mode.js                # recherche degoog, streaming et conversation
-├── locales/               # traductions en/fr
-├── providers/             # adaptateurs protocolaires
-└── src/                   # prompt, panneau, pipeline SSE et validation
+├── index.js               # slot contract, search-bar action, settings, and routes
+├── script.js              # search-bar navigation, streaming, citations, and follow-ups
+├── style.css              # native degoog presentation
+├── mode.html              # full-page AI Mode
+├── mode.css               # desktop/mobile research workspace
+├── mode.js                # degoog search, streaming, and conversation
+├── locales/               # degoog locale resources with English interface strings
+├── providers/             # protocol adapters
+└── src/                   # prompt, panel, SSE pipeline, and validation
 ```
 
-Le navigateur envoie la requête et les résultats déjà rendus à
-`/api/plugin/<id>/stream`. Le serveur nettoie les données, construit un prompt
-qui marque les résultats comme non fiables, appelle le fournisseur puis renvoie
-des événements SSE `delta`, `thinking`, `done` ou `error`.
-Les miniatures restent servies par le proxy d’images signé degoog ; leur ajout ne
-rend pas le client responsable des appels aux sites sources.
+The browser sends the query and rendered results to
+`/api/plugin/<id>/stream`. The server sanitizes the data, builds a prompt that
+marks results as untrusted, calls the provider, and returns `delta`, `thinking`,
+`done`, or `error` SSE events.
 
-Depuis un Overview, le bouton **Mode IA** transmet temporairement la requête et
-les sources déjà chargées à la page complète. Une nouvelle question lancée dans
-cette page interroge l’API de recherche degoog, puis envoie uniquement ses
-résultats nettoyés au même pipeline LLM côté serveur. L’URL réelle de la page est
-construite avec `ctx.apiBase`, afin de rester valide après une installation Store.
-La page peut aussi être ouverte directement sur `<ctx.apiBase>/mode` ; une
-requête placée dans `?q=` est relancée avec les moteurs degoog actifs.
+Thumbnails continue to be served through degoog's signed image proxy; adding
+them does not make the client responsible for requests to source websites.
 
-## Limites
+The **AI Mode** action in degoog's home and results search bars opens the
+full-page experience and carries over the current query when one is present.
+From an Overview, the existing **AI Mode** button also carries the loaded sources
+into the full-page experience temporarily. A new question submitted from that
+page queries the degoog search API and sends only its sanitized results through
+the same server-side LLM pipeline. The page URL is built from the installed
+plugin ID so that it remains valid after Store installation. The page can also
+be opened directly at `<ctx.apiBase>/mode`; a query supplied in `?q=` is rerun
+with the active degoog search engines.
 
-- Une citation signifie que le modèle l’a associée à un extrait de résultat ;
-  elle ne remplace pas la vérification de la page source.
-- Le plugin synthétise les résultats degoog. Il ne reproduit pas le classement,
-  les modèles, les données propriétaires ni les réponses de Google.
-- Le Mode IA fourni ici prend en charge le texte et les questions de suivi. Il
-  n’implémente pas encore l’envoi vocal, les fichiers, les images utilisateur ou
-  un historique persistant.
-- La qualité dépend du moteur de recherche, des extraits disponibles, du modèle
-  choisi et de sa discipline de citation.
-- Les tarifs, modèles, limites et politiques de confidentialité restent ceux de
-  chaque fournisseur.
+## Limitations
 
-## Développement et tests
+- A citation means that the model associated a claim with a result snippet; it
+  is not a substitute for checking the source page.
+- The plugin synthesizes degoog results. It does not reproduce Google's ranking,
+  models, proprietary data, or answers.
+- The current AI Mode supports text and follow-up questions. It does not yet
+  support voice input, files, user images, or persistent history.
+- Quality depends on the search engine, available snippets, selected model, and
+  the model's citation discipline.
+- Pricing, model availability, limits, and privacy policies remain those of each
+  provider.
 
-Prérequis : Node.js 20 ou plus récent.
+## Development and testing
+
+Requires Node.js 20 or later.
 
 ```bash
 npm test
 npm run check
 ```
 
-La suite couvre les presets, la sélection automatique de protocole, la
-validation des réglages, l’échappement HTML/URL, les prompts et les flux OpenAI
-Chat, OpenAI Responses, Anthropic, Gemini et Ollama.
+The test suite covers presets, automatic protocol selection, settings
+validation, HTML/URL escaping, prompts, and OpenAI Chat, OpenAI Responses,
+Anthropic, Gemini, and Ollama streams.
 
-Références de développement :
+Development references:
 
-- [Plugins degoog](https://degoog-org.github.io/docs/plugins.html)
-- [Styles et variables degoog](https://degoog-org.github.io/docs/styling.html)
-- [Traductions degoog](https://degoog-org.github.io/docs/translations.html)
-- [Google AI Overviews, référence d’interaction](https://search.google/ways-to-search/ai-overviews/)
+- [degoog plugins](https://degoog-org.github.io/docs/plugins.html)
+- [degoog styles and variables](https://degoog-org.github.io/docs/styling.html)
+- [degoog translations](https://degoog-org.github.io/docs/translations.html)
+- [Google AI Overviews interaction reference](https://search.google/ways-to-search/ai-overviews/)
 
-## Licence
+## License
 
 [MIT](LICENSE)
